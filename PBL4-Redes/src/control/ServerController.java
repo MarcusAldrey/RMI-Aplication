@@ -14,6 +14,7 @@ import util.APIGate;
 public class ServerController {
 	
 	private static ServerController instance;
+	private HashMap<String, String> files = new HashMap<String,String>();
 	private String localURL;
 	private String gatelURL;
 	
@@ -21,22 +22,37 @@ public class ServerController {
 		
 	}
 	
+	/**
+	 * Saves the URL from local RMI service
+	 * @param localURL
+	 */
 	public void setLocalURL(String localURL) {
 		this.localURL = localURL;
 	}
 	
+	/**
+	 * Saves the URL from the gate
+	 * @param gateURL
+	 */
 	public void setGateURL(String gateURL) {
 		this.gatelURL = gateURL;
 	}
 	
+	/**
+	 * Returns the Singleton instance from the controller 
+	 * @return
+	 */
 	public static ServerController getInstance() {
 		if(instance == null)
 			instance = new ServerController();
 		return instance;
 	}
-	
-	private HashMap<String, String> files = new HashMap<String,String>();
-	
+		
+	/**
+	 * Saves a file name and its filepath in a hashmap
+	 * @param fileName
+	 * @param filePath
+	 */
 	public void mapFile(String fileName, String filePath) {
 		files.put(fileName, filePath);
 		try {
@@ -48,6 +64,11 @@ public class ServerController {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param fileName
+	 * @return
+	 */
 	public File searchFile(String fileName) {
 		return new File(files.get(fileName));
 	}

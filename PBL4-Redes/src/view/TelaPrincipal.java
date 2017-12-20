@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -8,10 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileView;
-import javax.swing.plaf.FileChooserUI;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
@@ -24,13 +19,14 @@ import javax.swing.JOptionPane;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.awt.Font;
-import java.awt.Toolkit;
-
 import javax.swing.JTextField;
-import javax.swing.JSeparator;
 
 public class TelaPrincipal extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField searchTextField;
 	private JTextField removeTextField;
@@ -63,45 +59,46 @@ public class TelaPrincipal extends JFrame {
 	public TelaPrincipal() throws UnsupportedLookAndFeelException {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(new MaterialLookAndFeel(GUITheme.LIGHT_THEME));
-		setBounds(100, 100, 561, 499);
+		setBounds(100,100, 560, 499);
+		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(null);
 
 		MaterialButton addFileBtn = new MaterialButton("Adicionar arquivo");
+		addFileBtn.setBounds(155, 253, 250, 58);
 		addFileBtn.setFont(new Font("Roboto Medium", Font.PLAIN, 13));
 		addFileBtn.addActionListener(new AddFileAction());
-		addFileBtn.setBounds(164, 253, 256, 58);
+		contentPane.setLayout(null);
 		contentPane.add(addFileBtn);
 
 		JLabel label = new JLabel("");
+		label.setBounds(110, 30, 340, 198);
 		label.setIcon(new ImageIcon(TelaPrincipal.class.getResource("/view/Screenshot_3.png")));
-		label.setBounds(110, 29, 310, 198);
 		contentPane.add(label);
 
 		MaterialButton searchFileBtn = new MaterialButton("Adicionar arquivo");
+		searchFileBtn.setBounds(20, 322, 147, 58);
 		searchFileBtn.setText("Procurar");
 		searchFileBtn.setFont(new Font("Roboto Medium", Font.PLAIN, 13));
-		searchFileBtn.setBounds(57, 322, 97, 58);
 		contentPane.add(searchFileBtn);
 
 		searchTextField = new JTextField();
+		searchTextField.setBounds(180, 342, 310, 20);
 		searchTextField.setFont(new Font("Roboto Light", Font.PLAIN, 11));
-		searchTextField.setBounds(164, 342, 256, 20);
 		contentPane.add(searchTextField);
 		searchTextField.setColumns(10);
 
 		MaterialButton removeFileBtn = new MaterialButton("Adicionar arquivo");
+		removeFileBtn.setBounds(20, 391, 147, 58);
 		removeFileBtn.setText("Remover");
 		removeFileBtn.setFont(new Font("Roboto Medium", Font.PLAIN, 13));
-		removeFileBtn.setBounds(57, 391, 97, 58);
 		contentPane.add(removeFileBtn);
 
 		removeTextField = new JTextField();
+		removeTextField.setBounds(180, 411, 310, 20);
 		removeTextField.setFont(new Font("Roboto Thin", Font.PLAIN, 11));
 		removeTextField.setColumns(10);
-		removeTextField.setBounds(164, 411, 256, 20);
 		contentPane.add(removeTextField);
 	}
 
