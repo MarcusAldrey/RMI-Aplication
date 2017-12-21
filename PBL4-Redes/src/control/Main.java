@@ -2,6 +2,7 @@ package control;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.JOptionPane;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -15,20 +16,25 @@ public class Main {
 		
 		try {
 			
-		String IpGate = JOptionPane.showInputDialog("Insira o ip do gate");
-		String urlPorteiro = String.format("rmi://%s:%d/porteiro", IpGate,1099);
+		String IpGate = JOptionPane.showInputDialog("Insira o IP do gate");
+		String urlGate = String.format("rmi://%s:%d/gate", IpGate,1099);
 		String ipLocal = InetAddress.getLocalHost().getHostAddress();
 		
-		double id = Math.random()*100 + 1;
-		String urlLocal = String.format("rmi://%s:%d/%s", IpGate,1099, id);
+		int id = ThreadLocalRandom.current().nextInt(1, 100000 + 1);
+		String urlLocal = String.format("rmi://%s:%d/%s", ipLocal,1099, "cliente"+id);
+		
 		
 		ClientController.getInstance().setLocalUrl(urlLocal);
-		ClientController.getInstance().setGateURL(urlPorteiro);
-		ServerController.getInstance().setGateURL(urlPorteiro);
+		ClientController.getInstance().setGateURL(urlGate);
+		ServerController.getInstance().setGateURL(urlGate);
 		ServerController.getInstance().setLocalURL(urlLocal);
-		
-		new TelaPrincipal();
+		TelaPrincipal tela = new TelaPrincipal();
+		tela.setVisible(true);
 		new RMIService(urlLocal);
+		System.out.println("Novo serviço de cliente criado com url " + urlLocal);
+		System.out.println("URL do gate " + urlGate);
+		
+
 			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block

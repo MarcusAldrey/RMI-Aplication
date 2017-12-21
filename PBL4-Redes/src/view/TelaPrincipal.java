@@ -7,12 +7,18 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+
+import control.ClientController;
+
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -81,6 +87,19 @@ public class TelaPrincipal extends JFrame {
 		searchFileBtn.setBounds(20, 322, 147, 58);
 		searchFileBtn.setText("Procurar");
 		searchFileBtn.setFont(new Font("Roboto Medium", Font.PLAIN, 13));
+		searchFileBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				try {
+					ClientController.getInstance().searchFile(searchTextField.getText());
+				} catch (MalformedURLException | RemoteException | NotBoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		contentPane.add(searchFileBtn);
 
 		searchTextField = new JTextField();
@@ -93,6 +112,19 @@ public class TelaPrincipal extends JFrame {
 		removeFileBtn.setBounds(20, 391, 147, 58);
 		removeFileBtn.setText("Remover");
 		removeFileBtn.setFont(new Font("Roboto Medium", Font.PLAIN, 13));
+		removeFileBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				try {
+					ClientController.getInstance().removeFile(removeTextField.getText());
+				} catch (MalformedURLException | RemoteException | NotBoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		contentPane.add(removeFileBtn);
 
 		removeTextField = new JTextField();
@@ -121,7 +153,15 @@ public class TelaPrincipal extends JFrame {
 			
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
-				System.out.println(file.getPath());
+				try {
+					ClientController.getInstance().addFile(file);
+				} catch (MalformedURLException | RemoteException | NotBoundException e1) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Não foi possível adicionar o arquivo");
+					e1.printStackTrace();
+					return;
+				}
+				JOptionPane.showMessageDialog(null, "Arquivo adicionado com sucesso");
 			}
 			else {
 				JOptionPane.showMessageDialog(null, "Você deve escolher um arquivo para compartilhar");
@@ -129,5 +169,7 @@ public class TelaPrincipal extends JFrame {
 		}
 
 	}
+	
+	
 
 }

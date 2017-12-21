@@ -64,10 +64,10 @@ public class ClientController {
 	 * @throws RemoteException
 	 * @throws NotBoundException
 	 */
-	public void searchFile(String fileName) throws MalformedURLException, RemoteException, NotBoundException {
+	public byte[] searchFile(String fileName) throws MalformedURLException, RemoteException, NotBoundException {
 		APIGate aPIGate = (APIGate) Naming.lookup(gatelURL);
 		API remoteServer = (API) Naming.lookup(aPIGate.searchHost(fileName));
-		byte[] receivedFile = remoteServer.download(fileName);
+		return remoteServer.download(fileName);
 	}
 	
 	/**

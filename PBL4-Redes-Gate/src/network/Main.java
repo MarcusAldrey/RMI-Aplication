@@ -13,8 +13,9 @@ public class Main {
 		try {
 			ip = InetAddress.getLocalHost().getHostName();
 			String url = String.format("rmi://%s:%d/%s",ip,1099,"gate");
-			Naming.bind(url, new GateImplement());
-		} catch (UnknownHostException | MalformedURLException | RemoteException | AlreadyBoundException e) {
+			System.out.println("Serviço de porteiro iniciado com url " + url);
+			Naming.rebind(url, new GateImplement());
+		} catch (UnknownHostException | MalformedURLException | RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

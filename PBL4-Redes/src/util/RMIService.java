@@ -9,8 +9,8 @@ public class RMIService {
 
 	public RMIService(String url) {
 		try {
-			Naming.bind(url, new APIImplement());
-		} catch (MalformedURLException | RemoteException | AlreadyBoundException e) {
+			Naming.rebind(url, new APIImplement());
+		} catch (MalformedURLException | RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
