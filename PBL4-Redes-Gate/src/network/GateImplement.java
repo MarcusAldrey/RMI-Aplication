@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
+import util.APIGate;
+
 public class GateImplement extends UnicastRemoteObject implements APIGate {
 
 	/**
