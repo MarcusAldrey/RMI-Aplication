@@ -2,7 +2,9 @@ package control;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -49,8 +51,14 @@ public class ClientController {
 	 * @throws NotBoundException
 	 */
 	public void addFile(File file) throws MalformedURLException, RemoteException, NotBoundException {
-		API api = (API) Naming.lookup(localURL);
-		api.saveFile(file);
+		API api;
+		try {
+			api = (API) Naming.lookup("rmi://"+Inet4Address.getLocalHost().getHostName()+":"+51000+"/"+localURL);
+			api.saveFile(file);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 	
 	/**
