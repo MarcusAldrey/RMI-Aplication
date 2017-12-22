@@ -6,7 +6,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import control.ServerController;
 
-public class APIImplement extends UnicastRemoteObject implements API {
+public class APIImplement implements API {
 
 	/**
 	 * 

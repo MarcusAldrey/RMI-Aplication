@@ -26,12 +26,13 @@ public class Main {
 		String IpGate = JOptionPane.showInputDialog("Insira o IP do gate");
 		String portaGate = JOptionPane.showInputDialog("Insira a porta do gate");
 		
-		LocateRegistry.createRegistry(1099);
+		LocateRegistry.createRegistry(51000);
 		
-		String localUrl = String.format("rmi://%s:%d/cliente", InetAddress.getLocalHost().getHostAddress(),1099);
+		String localUrl = "cliente";
 		
-		Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-		registry.bind(localUrl,new APIImplement());
+		Registry registry = LocateRegistry.getRegistry("localhost", 51000);
+		API stub = (API) UnicastRemoteObject.exportObject(new APIImplement(), 0);
+		registry.bind(localUrl, stub);
 		
 		System.out.println("Novo registro criado em " + localUrl);
 		
