@@ -15,7 +15,7 @@ public class APIImplement extends UnicastRemoteObject implements API {
 	
 	private ServerController controller = ServerController.getInstance();
 
-	protected APIImplement() throws RemoteException {
+	public APIImplement() throws RemoteException {
 		super();
 		// TODO Auto-generated constructor stub
 	}

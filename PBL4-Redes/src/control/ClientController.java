@@ -1,11 +1,15 @@
 package control;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
+import exceptions.HostNotFoundException;
 import util.API;
 import util.APIGate;
 
@@ -13,28 +17,20 @@ public class ClientController {
 
 	private static ClientController instance;
 	private String localURL;
-	private String gatelURL;
+	private Communication communication; 
 	
 	private ClientController() {
-		
+
 	}
 	
-	/**
-	 * Saves the URL from local RMI service
-	 * @param localURL
-	 */
-	public void setLocalUrl(String localURL) {
-		this.localURL = localURL;
+	public void criarConexao(String IP, int porta) throws IOException {
+		communication = new Communication(IP, porta);
 	}
 	
-	/**
-	 * Saves the URL from the gate
-	 * @param gateURL
-	 */
-	public void setGateURL(String gateURL) {
-		this.gatelURL = gateURL;
+	public void setLocalUrl(String localUrl) {
+		this.localURL = localUrl;
 	}
-	
+
 	/**
 	 * Returns the Singleton instance from the controller 
 	 * @return
@@ -63,10 +59,15 @@ public class ClientController {
 	 * @throws MalformedURLException
 	 * @throws RemoteException
 	 * @throws NotBoundException
+	 * @throws HostNotFoundException 
 	 */
-	public byte[] searchFile(String fileName) throws MalformedURLException, RemoteException, NotBoundException {
-		APIGate aPIGate = (APIGate) Naming.lookup(gatelURL);
-		API remoteServer = (API) Naming.lookup(aPIGate.searchHost(fileName));
+	public byte[] searchFile(String fileName) throws MalformedURLException, RemoteException, NotBoundException, HostNotFoundException {
+		APIGate aPIGate = communication;
+		String ipHost = aPIGate.searchHost(fileName);
+		if(ipHost == null)
+			throw new HostNotFoundException();
+		Registry registry = LocateRegistry.getRegistry(ipHost, 1099);
+		API remoteServer = (API) registry.lookup(localURL);
 		return remoteServer.download(fileName);
 	}
 	
@@ -78,9 +79,14 @@ public class ClientController {
 	 * @throws NotBoundException
 	 */
 	public void removeFile(String fileName) throws MalformedURLException, RemoteException, NotBoundException {
-		APIGate aPIGate = (APIGate) Naming.lookup(gatelURL);
+		APIGate aPIGate = communication;
 		API remoteServer = (API) Naming.lookup(aPIGate.searchHost(fileName));
 		remoteServer.remove(fileName);
+	}
+	
+	public String[] getAllFiles() {
+		APIGate aPIGate = communication;
+		return aPIGate.getAllFiles();
 	}
 	
 }

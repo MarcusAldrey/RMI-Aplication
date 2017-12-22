@@ -1,13 +1,20 @@
 package control;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.concurrent.ThreadLocalRandom;
+import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
+import javax.sound.midi.ControllerEventListener;
 import javax.swing.JOptionPane;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import util.RMIService;
+import util.API;
+import util.APIImplement;
 import view.TelaPrincipal;
 
 public class Main {
@@ -17,29 +24,39 @@ public class Main {
 		try {
 			
 		String IpGate = JOptionPane.showInputDialog("Insira o IP do gate");
-		String urlGate = String.format("rmi://%s:%d/gate", IpGate,1099);
-		String ipLocal = InetAddress.getLocalHost().getHostAddress();
+		String portaGate = JOptionPane.showInputDialog("Insira a porta do gate");
 		
-		int id = ThreadLocalRandom.current().nextInt(1, 100000 + 1);
-		String urlLocal = String.format("rmi://%s:%d/%s", ipLocal,1099, "cliente"+id);
+		LocateRegistry.createRegistry(1099);
 		
+		String localUrl = String.format("rmi://%s:%d/cliente", InetAddress.getLocalHost().getHostAddress(),1099);
 		
-		ClientController.getInstance().setLocalUrl(urlLocal);
-		ClientController.getInstance().setGateURL(urlGate);
-		ServerController.getInstance().setGateURL(urlGate);
-		ServerController.getInstance().setLocalURL(urlLocal);
+		Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+		registry.bind(localUrl,new APIImplement());
+		
+		System.out.println("Novo registro criado em " + localUrl);
+		
+		ClientController.getInstance().criarConexao(IpGate, Integer.parseInt(portaGate));
+		ClientController.getInstance().setLocalUrl(localUrl);
+		
 		TelaPrincipal tela = new TelaPrincipal();
 		tela.setVisible(true);
-		new RMIService(urlLocal);
-		System.out.println("Novo serviço de cliente criado com url " + urlLocal);
-		System.out.println("URL do gate " + urlGate);
-		
-
 			
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
+		} catch (AlreadyBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

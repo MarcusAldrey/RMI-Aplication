@@ -7,9 +7,11 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import control.ClientController;
-
+import exceptions.HostNotFoundException;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
@@ -21,11 +23,12 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.imageio.ImageIO;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import java.awt.Font;
-import javax.swing.JTextField;
 
 public class TelaPrincipal extends JFrame {
 
@@ -34,8 +37,9 @@ public class TelaPrincipal extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField searchTextField;
-	private JTextField removeTextField;
+	private JList<?> list;
+	private String arquivoSelecionado;
+	DefaultListModel<String> model;
 
 	/**
 	 * Launch the application.
@@ -65,73 +69,55 @@ public class TelaPrincipal extends JFrame {
 	public TelaPrincipal() throws UnsupportedLookAndFeelException {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UIManager.setLookAndFeel(new MaterialLookAndFeel(GUITheme.LIGHT_THEME));
-		setBounds(100,100, 560, 499);
-		setResizable(false);
+		setBounds(100,100, 607, 499);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
+		
+		model = new DefaultListModel<String>();
+		list = new JList<String>(model);
+		list.setBounds(10, 36, 221, 413);
+		list.setVisibleRowCount(10);
+		list.addListSelectionListener(new SelecaoDePaciente());
+		contentPane.add(list);
 
 		MaterialButton addFileBtn = new MaterialButton("Adicionar arquivo");
-		addFileBtn.setBounds(155, 253, 250, 58);
+		addFileBtn.setBounds(282, 253, 250, 58);
 		addFileBtn.setFont(new Font("Roboto Medium", Font.PLAIN, 13));
 		addFileBtn.addActionListener(new AddFileAction());
 		contentPane.setLayout(null);
 		contentPane.add(addFileBtn);
 
 		JLabel label = new JLabel("");
-		label.setBounds(110, 30, 340, 198);
+		label.setBounds(241, 11, 340, 198);
 		label.setIcon(new ImageIcon(TelaPrincipal.class.getResource("/view/Screenshot_3.png")));
 		contentPane.add(label);
 
 		MaterialButton searchFileBtn = new MaterialButton("Adicionar arquivo");
-		searchFileBtn.setBounds(20, 322, 147, 58);
-		searchFileBtn.setText("Procurar");
+		searchFileBtn.setBounds(282, 322, 250, 58);
+		searchFileBtn.setText("Baixar");
 		searchFileBtn.setFont(new Font("Roboto Medium", Font.PLAIN, 13));
-		searchFileBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				try {
-					ClientController.getInstance().searchFile(searchTextField.getText());
-				} catch (MalformedURLException | RemoteException | NotBoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
+		searchFileBtn.addActionListener(new DownloadAction());
 		contentPane.add(searchFileBtn);
 
-		searchTextField = new JTextField();
-		searchTextField.setBounds(180, 342, 310, 20);
-		searchTextField.setFont(new Font("Roboto Light", Font.PLAIN, 11));
-		contentPane.add(searchTextField);
-		searchTextField.setColumns(10);
-
 		MaterialButton removeFileBtn = new MaterialButton("Adicionar arquivo");
-		removeFileBtn.setBounds(20, 391, 147, 58);
+		removeFileBtn.setBounds(282, 391, 250, 58);
 		removeFileBtn.setText("Remover");
 		removeFileBtn.setFont(new Font("Roboto Medium", Font.PLAIN, 13));
-		removeFileBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				try {
-					ClientController.getInstance().removeFile(removeTextField.getText());
-				} catch (MalformedURLException | RemoteException | NotBoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
+		removeFileBtn.addActionListener(new removeAction());
 		contentPane.add(removeFileBtn);
-
-		removeTextField = new JTextField();
-		removeTextField.setBounds(180, 411, 310, 20);
-		removeTextField.setFont(new Font("Roboto Thin", Font.PLAIN, 11));
-		removeTextField.setColumns(10);
-		contentPane.add(removeTextField);
+		
+		JLabel lblArquivosCompartilhados = new JLabel("Arquivos compartilhados");
+		lblArquivosCompartilhados.setFont(new Font("Roboto", Font.PLAIN, 13));
+		lblArquivosCompartilhados.setBounds(10, 11, 221, 14);
+		contentPane.add(lblArquivosCompartilhados);
+	}
+	
+	private void updateSharedFiles() {
+		model.clear();
+		String[] allFiles = ClientController.getInstance().getAllFiles();
+		for(String file : allFiles)
+			model.addElement(file);
 	}
 
 	private class AddFileAction implements ActionListener {
@@ -170,6 +156,49 @@ public class TelaPrincipal extends JFrame {
 
 	}
 	
-	
+	private class SelecaoDePaciente implements ListSelectionListener {
 
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			// TODO Auto-generated method stub
+			if(e.getValueIsAdjusting()) {
+				arquivoSelecionado = (String) list.getSelectedValue();
+				System.out.println(arquivoSelecionado);
+			}
+		}
+
+	}
+	
+	private class DownloadAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			try {
+				ClientController.getInstance().searchFile(arquivoSelecionado);
+			} catch (MalformedURLException | RemoteException | NotBoundException | HostNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	private class removeAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			try {
+				ClientController.getInstance().removeFile(arquivoSelecionado);
+			} catch (MalformedURLException | RemoteException | NotBoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			updateSharedFiles();
+		}
+		
+	}
+	
+	
 }
